@@ -98,8 +98,8 @@ public class LineBotController {
         return greeter.sayHello();
     }
 
-    @RequestMapping("/greeting")
-    public String greeting(@RequestParam(value="targetId") String targetId, @RequestParam(value="message", defaultValue = "Hello!") String message) {
+    @RequestMapping("/push")
+    public String greeting(@RequestParam(value="group_Id") String targetId, @RequestParam(value="msg", defaultValue = "Hello!") String message) {
         if (ObjectUtils.isEmpty(targetId)) {
             return "Error in sending messages : targetId isn't given.";
         }
