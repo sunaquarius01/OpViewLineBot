@@ -275,180 +275,180 @@ public class LineBotController {
         String helpText = "You can input the following messages to see each results:\n(0)help,\n(1)profile,\n(2)bye,\n(3)confirm,\n(4)buttons,\n(5)carousel,\n(6)imagemap.";
 
         log.info("Got text message from {}: {}", replyToken, text);
-        switch (text) {
-            case "readme": case "0": {
-                this.replyText(replyToken, helpText);
-                break;
-            }
-            case "profile": case "1": {
-                String userId = event.getSource().getUserId();
-                if (userId != null) {
-                    UserProfileResponse userProfile = getUserProfile(userId);
-                    String pictureUrlURL = userProfile.getPictureUrl() == null ? "(Not Set)" : userProfile.getPictureUrl();
-                    String displayName = userProfile.getDisplayName() == null ? "(Not Set)" : userProfile.getDisplayName();
-                    String displayStatus = userProfile.getStatusMessage() == null ? "(Not Set)" : userProfile.getStatusMessage();
-                    OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder().url(pictureUrlURL).build();
-                    okhttp3.Response response = client.newCall(request).execute();
-                    DownloadedContent jpg = saveContent("jpg", response.body());
-                    this.reply(replyToken, Arrays.asList(
-                            new ImageMessage(jpg.getUri(), jpg.getUri()),
-                            new TextMessage("Hi, " + displayName),
-                            new TextMessage("Your status is : " + displayStatus)
-                    ));
-                } else {
-                    this.replyText(replyToken, "Bot can only get a user's profile when 1:1 chat");
-                }
-                break;
-            }
-            case "bye": case "2": {
-                Source source = event.getSource();
-                if (source instanceof GroupSource) {
-                    ConfirmTemplate confirmTemplate = new ConfirmTemplate(
-                            "I am going to leave this group, are you sure?",
-                            new PostbackAction("Yes,right now!", "bye:yes"),
-                            new PostbackAction("No,stay here!", "bye:no")
-                    );
-                    TemplateMessage templateMessage = new TemplateMessage(
-                            "Sorry, I don't support the Confirm function in your platform. :(",
-                            confirmTemplate
-                    );
-                    this.reply(replyToken, templateMessage);
-                } else if (source instanceof RoomSource) {
-                    ConfirmTemplate confirmTemplate = new ConfirmTemplate(
-                            "I am going to leave this room, are you sure?",
-                            new PostbackAction("Yes,right now!", "bye:yes"),
-                            new PostbackAction("No,stay here!", "bye:no")
-                    );
-                    TemplateMessage templateMessage = new TemplateMessage(
-                            "Sorry, I don't support the Confirm function in your platform. :(",
-                            confirmTemplate
-                    );
-                    this.reply(replyToken, templateMessage);
-                } else {
-                    this.replyText(replyToken, "Bot can't leave from 1:1 chat");
-                }
-                break;
-            }
-            case "confirm": case "3": {
-                ConfirmTemplate confirmTemplate = new ConfirmTemplate(
-                        "Do you love Taiwan?",
-                        new MessageAction("Yes", "Yes, I love Taiwan!"),
-                        new MessageAction("No", "No, it is just an oni island!")
-                );
-                TemplateMessage templateMessage = new TemplateMessage(
-                        "Sorry, I don't support the Confirm function in your platform. :(",
-                        confirmTemplate
-                );
-                this.reply(replyToken, templateMessage);
-                break;
-            }
-            case "buttons": case "4": {
-                String imageUrl = createUri("/static/buttons/goodsmile.jpg");
-                ButtonsTemplate buttonsTemplate = new ButtonsTemplate(
-                        imageUrl,
-                        "My button sample",
-                        "Hello, my button",
-                        Arrays.asList(
-                                new URIAction("Go to line.me",
-                                              "https://line.me"),
-                                new PostbackAction("Say opViewLineBot 1",
-                                                   "Hello 你好!"),
-                                new PostbackAction("Say opViewLineBot 2",
-                                                   "Hello 你好!!",
-                                                   "Hello 你好!!"),
-                                new MessageAction("Say message",
-                                                  "Rice=米")
-                        )
-                );
-                TemplateMessage templateMessage = new TemplateMessage("Sorry, I don't support the Button function in your platform. :(", buttonsTemplate);
-                this.reply(replyToken, templateMessage);
-                break;
-            }
-            case "carousel": case "5" : {
-                String imageUrl1 = createUri("/static/buttons/figure1.jpg");
-                String imageUrl2 = createUri("/static/buttons/figure2.jpg");
-                String imageUrl3 = createUri("/static/buttons/figure3.jpg");
-                CarouselTemplate carouselTemplate = new CarouselTemplate(
-                        Arrays.asList(
-                                new CarouselColumn(
-                                        imageUrl1,
-                                        "黑岩射手",
-                                        "NT$ 1,357 (¥ 4,960)",
-                                        Arrays.asList(
-                                                new URIAction(
-                                                        "Buy it !",
-                                                        "http://global.rakuten.com/zh-tw/store/amiami/item/figure-026643/"
-                                                )
-                                        )
-                                ),
-                                new CarouselColumn(
-                                        imageUrl2,
-                                        "加藤恵",
-                                        "NT$ 1,017 (¥ 3,720)",
-                                        Arrays.asList(
-                                                new URIAction(
-                                                        "Buy it !",
-                                                        "http://global.rakuten.com/zh-tw/store/amiami/item/figure-026535/"
-                                                )
-                                        )
-                                ),
-                                new CarouselColumn(
-                                        imageUrl3,
-                                        "-艦これ- Iowa",
-                                        "NT$ 1,748 (¥ 6,390)",
-                                        Arrays.asList(
-                                                new URIAction(
-                                                        "Buy it !",
-                                                        "http://global.rakuten.com/zh-tw/store/amiami/item/figure-024873/"
-                                                )
-                                        )
-                                )
-                        )
-                );
-                TemplateMessage templateMessage = new TemplateMessage("Sorry, I don't support the Carousel function in your platform. :(", carouselTemplate);
-                this.reply(replyToken, templateMessage);
-                break;
-            }
-            case "imagemap": case "6": {
-                this.reply(replyToken, Arrays.asList(
-                        new TextMessage("Please press any text in the picture to see what will happen."),
-                        new ImagemapMessage(
-                                createUri("/static/rich"),
-                                "Sorry, I don't support the Imagemap function in your platform. :(",
-                                new ImagemapBaseSize(1040, 1040),
-                                Arrays.asList(
-                                        new URIImagemapAction(
-                                                "https://store.line.me/family/manga/en",
-                                                new ImagemapArea(0, 0, 520, 520)
-                                        ),
-                                        new URIImagemapAction(
-                                                "https://store.line.me/family/music/en",
-                                                new ImagemapArea(520, 0, 520, 520)
-                                        ),
-                                        new URIImagemapAction(
-                                                "https://store.line.me/family/play/en",
-                                                new ImagemapArea(0, 520, 520, 520)
-                                        ),
-                                        new MessageImagemapAction(
-                                                "URANAI!",
-                                                new ImagemapArea(520, 520, 520, 520)
-                                        )
-                                )
-                        )
-                ));
-                break;
-            }
-            default:
-                log.info("Returns echo message {}: {}", replyToken, text);
-                this.reply(
-                        replyToken,
-                        Arrays.asList(
-                                new TextMessage("You said : " + text),
-                                new TextMessage(helpText)
-                        )
-                );
-        }
+//        switch (text) {
+//            case "readme": case "0": {
+//                this.replyText(replyToken, helpText);
+//                break;
+//            }
+//            case "profile": case "1": {
+//                String userId = event.getSource().getUserId();
+//                if (userId != null) {
+//                    UserProfileResponse userProfile = getUserProfile(userId);
+//                    String pictureUrlURL = userProfile.getPictureUrl() == null ? "(Not Set)" : userProfile.getPictureUrl();
+//                    String displayName = userProfile.getDisplayName() == null ? "(Not Set)" : userProfile.getDisplayName();
+//                    String displayStatus = userProfile.getStatusMessage() == null ? "(Not Set)" : userProfile.getStatusMessage();
+//                    OkHttpClient client = new OkHttpClient();
+//                    Request request = new Request.Builder().url(pictureUrlURL).build();
+//                    okhttp3.Response response = client.newCall(request).execute();
+//                    DownloadedContent jpg = saveContent("jpg", response.body());
+//                    this.reply(replyToken, Arrays.asList(
+//                            new ImageMessage(jpg.getUri(), jpg.getUri()),
+//                            new TextMessage("Hi, " + displayName),
+//                            new TextMessage("Your status is : " + displayStatus)
+//                    ));
+//                } else {
+//                    this.replyText(replyToken, "Bot can only get a user's profile when 1:1 chat");
+//                }
+//                break;
+//            }
+//            case "bye": case "2": {
+//                Source source = event.getSource();
+//                if (source instanceof GroupSource) {
+//                    ConfirmTemplate confirmTemplate = new ConfirmTemplate(
+//                            "I am going to leave this group, are you sure?",
+//                            new PostbackAction("Yes,right now!", "bye:yes"),
+//                            new PostbackAction("No,stay here!", "bye:no")
+//                    );
+//                    TemplateMessage templateMessage = new TemplateMessage(
+//                            "Sorry, I don't support the Confirm function in your platform. :(",
+//                            confirmTemplate
+//                    );
+//                    this.reply(replyToken, templateMessage);
+//                } else if (source instanceof RoomSource) {
+//                    ConfirmTemplate confirmTemplate = new ConfirmTemplate(
+//                            "I am going to leave this room, are you sure?",
+//                            new PostbackAction("Yes,right now!", "bye:yes"),
+//                            new PostbackAction("No,stay here!", "bye:no")
+//                    );
+//                    TemplateMessage templateMessage = new TemplateMessage(
+//                            "Sorry, I don't support the Confirm function in your platform. :(",
+//                            confirmTemplate
+//                    );
+//                    this.reply(replyToken, templateMessage);
+//                } else {
+//                    this.replyText(replyToken, "Bot can't leave from 1:1 chat");
+//                }
+//                break;
+//            }
+//            case "confirm": case "3": {
+//                ConfirmTemplate confirmTemplate = new ConfirmTemplate(
+//                        "Do you love Taiwan?",
+//                        new MessageAction("Yes", "Yes, I love Taiwan!"),
+//                        new MessageAction("No", "No, it is just an oni island!")
+//                );
+//                TemplateMessage templateMessage = new TemplateMessage(
+//                        "Sorry, I don't support the Confirm function in your platform. :(",
+//                        confirmTemplate
+//                );
+//                this.reply(replyToken, templateMessage);
+//                break;
+//            }
+//            case "buttons": case "4": {
+//                String imageUrl = createUri("/static/buttons/goodsmile.jpg");
+//                ButtonsTemplate buttonsTemplate = new ButtonsTemplate(
+//                        imageUrl,
+//                        "My button sample",
+//                        "Hello, my button",
+//                        Arrays.asList(
+//                                new URIAction("Go to line.me",
+//                                              "https://line.me"),
+//                                new PostbackAction("Say opViewLineBot 1",
+//                                                   "Hello 你好!"),
+//                                new PostbackAction("Say opViewLineBot 2",
+//                                                   "Hello 你好!!",
+//                                                   "Hello 你好!!"),
+//                                new MessageAction("Say message",
+//                                                  "Rice=米")
+//                        )
+//                );
+//                TemplateMessage templateMessage = new TemplateMessage("Sorry, I don't support the Button function in your platform. :(", buttonsTemplate);
+//                this.reply(replyToken, templateMessage);
+//                break;
+//            }
+//            case "carousel": case "5" : {
+//                String imageUrl1 = createUri("/static/buttons/figure1.jpg");
+//                String imageUrl2 = createUri("/static/buttons/figure2.jpg");
+//                String imageUrl3 = createUri("/static/buttons/figure3.jpg");
+//                CarouselTemplate carouselTemplate = new CarouselTemplate(
+//                        Arrays.asList(
+//                                new CarouselColumn(
+//                                        imageUrl1,
+//                                        "黑岩射手",
+//                                        "NT$ 1,357 (¥ 4,960)",
+//                                        Arrays.asList(
+//                                                new URIAction(
+//                                                        "Buy it !",
+//                                                        "http://global.rakuten.com/zh-tw/store/amiami/item/figure-026643/"
+//                                                )
+//                                        )
+//                                ),
+//                                new CarouselColumn(
+//                                        imageUrl2,
+//                                        "加藤恵",
+//                                        "NT$ 1,017 (¥ 3,720)",
+//                                        Arrays.asList(
+//                                                new URIAction(
+//                                                        "Buy it !",
+//                                                        "http://global.rakuten.com/zh-tw/store/amiami/item/figure-026535/"
+//                                                )
+//                                        )
+//                                ),
+//                                new CarouselColumn(
+//                                        imageUrl3,
+//                                        "-艦これ- Iowa",
+//                                        "NT$ 1,748 (¥ 6,390)",
+//                                        Arrays.asList(
+//                                                new URIAction(
+//                                                        "Buy it !",
+//                                                        "http://global.rakuten.com/zh-tw/store/amiami/item/figure-024873/"
+//                                                )
+//                                        )
+//                                )
+//                        )
+//                );
+//                TemplateMessage templateMessage = new TemplateMessage("Sorry, I don't support the Carousel function in your platform. :(", carouselTemplate);
+//                this.reply(replyToken, templateMessage);
+//                break;
+//            }
+//            case "imagemap": case "6": {
+//                this.reply(replyToken, Arrays.asList(
+//                        new TextMessage("Please press any text in the picture to see what will happen."),
+//                        new ImagemapMessage(
+//                                createUri("/static/rich"),
+//                                "Sorry, I don't support the Imagemap function in your platform. :(",
+//                                new ImagemapBaseSize(1040, 1040),
+//                                Arrays.asList(
+//                                        new URIImagemapAction(
+//                                                "https://store.line.me/family/manga/en",
+//                                                new ImagemapArea(0, 0, 520, 520)
+//                                        ),
+//                                        new URIImagemapAction(
+//                                                "https://store.line.me/family/music/en",
+//                                                new ImagemapArea(520, 0, 520, 520)
+//                                        ),
+//                                        new URIImagemapAction(
+//                                                "https://store.line.me/family/play/en",
+//                                                new ImagemapArea(0, 520, 520, 520)
+//                                        ),
+//                                        new MessageImagemapAction(
+//                                                "URANAI!",
+//                                                new ImagemapArea(520, 520, 520, 520)
+//                                        )
+//                                )
+//                        )
+//                ));
+//                break;
+//            }
+//            default:
+//                log.info("Returns echo message {}: {}", replyToken, text);
+//                this.reply(
+//                        replyToken,
+//                        Arrays.asList(
+//                                new TextMessage("You said : " + text),
+//                                new TextMessage(helpText)
+//                        )
+//                );
+//        }
     }
 
     private void handleSticker(String replyToken, StickerMessageContent content) {
