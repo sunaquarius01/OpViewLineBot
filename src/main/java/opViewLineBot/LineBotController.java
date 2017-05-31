@@ -272,7 +272,7 @@ public class LineBotController {
                 String group_id = source.getSenderId();
                 String token = text.replace("token=", "");
                 String msg = group_id + " " + token;
-                URLEncoder.encode("msg","utf-8");
+                msg = URLEncoder.encode(msg,"utf-8");
                 String url = "https://opview-line-bot.herokuapp.com/push?group_Id=" + group_id + "&msg=" + msg;
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 log.info(url);
