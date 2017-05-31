@@ -36,6 +36,7 @@ import retrofit2.Response;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -271,6 +272,7 @@ public class LineBotController {
                 String group_id = source.getSenderId();
                 String token = text.replace("token=", "");
                 String msg = group_id + " " + token;
+                URLEncoder.encode("msg","utf-8");
                 String url = "https://opview-line-bot.herokuapp.com/push?group_Id=" + group_id + "&msg=" + msg;
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 log.info(url);
