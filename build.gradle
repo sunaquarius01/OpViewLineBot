@@ -1,4 +1,4 @@
-group 'opViewLineBot'
+group 'OpViewLineBot'
 version '1.0-SNAPSHOT'
 
 
@@ -11,15 +11,21 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
 
 mainClassName = 'opViewLineBot.LineBotApplication'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+allprojects {
+    apply plugin: 'java'
+
+    // JDK version source compatibility
+    sourceCompatibility = 1.8
+
+    // JDK version target compatibility
+    targetCompatibility = 1.8
+}
 
 repositories {
     mavenCentral()
@@ -32,6 +38,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-logging'
     compile 'joda-time:joda-time:2.2'
     compile 'org.projectlombok:lombok:1.16.12'
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
     testCompile 'junit:junit:4.11'
 }
 
