@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.ResponseBody;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -274,8 +275,8 @@ public class LineBotController {
                 verify_url = verify_url + "group_id=" + group_id + "&token=" + token;
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 log.info(verify_url);
-                HttpGet httpget = new HttpGet(verify_url);
-                CloseableHttpResponse response = httpClient.execute(httpget);
+                HttpPost httpPost = new HttpPost(verify_url);
+                CloseableHttpResponse response = httpClient.execute(httpPost);
                 log.info(String.valueOf(response.getStatusLine().getStatusCode()));
             }
         }
