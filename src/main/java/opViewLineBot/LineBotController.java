@@ -271,7 +271,7 @@ public class LineBotController {
             if (source != null) {
                 String group_id = source.getSenderId();
                 String token = text.replace("token=", "");
-                String verify_url = "https://opviewinsight.opview.com.tw/Line/Group/Verify?";
+                String verify_url = "http://172.20.30.19:8080/insight_API/Line/Group/Verify?";
                 verify_url = verify_url + "group_id=" + group_id + "&token=" + token;
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 log.info(verify_url);
