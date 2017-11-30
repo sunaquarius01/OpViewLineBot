@@ -263,7 +263,7 @@ public class LineBotController {
     }
 
     private void handleTextContent(String replyToken, Event event, TextMessageContent content) throws IOException {
-        String text = content.getText(); 
+        String text = content.getText();
 
         log.info("Got text message from {}: {}", replyToken, text);
         if(text.startsWith("token=")){
